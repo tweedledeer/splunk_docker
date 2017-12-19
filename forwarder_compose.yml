@@ -1,0 +1,26 @@
+version: '2'
+services:
+ vforwarder:
+   networks: 
+      - nett
+   image: busybox
+   volumes:
+     - /opt/splunk/etc
+     - /opt/splunk/var 
+
+ forwarder:
+   networks: 
+      - nett
+   container_name: forwarder
+   hostname: forwarder
+   image: circleci/splunk-forwarder:6.3.3
+   environment:
+     - SPLUNK_FORWARD_SERVER=splunk-forwarder:9997
+     - SPLUNK_START_ARGS=--accept-license --answer-yes
+   volumes_from:
+     - vforwarder
+   ports:
+     - 127.0.0.1:514:1514/udp
+   restart: always
+networks:
+  nett: {}

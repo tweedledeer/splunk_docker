@@ -1,0 +1,34 @@
+version: '2'
+services:
+ vforwarder:
+   networks: 
+      - nett
+   image: busybox
+   volumes:
+     - /opt/splunk/etc
+     - /opt/splunk/var 
+
+ forwarder:
+   networks: 
+      - nett
+   container_name: forwarder
+   hostname: forwarder
+   image: splunk/universalforwarder:7.0.0-monitor
+   environment:
+     - SPLUNK_FORWARD_SERVER=splunk:9997
+     - SPLUNK_START_ARGS=--accept-license --answer-yes
+     - SPLUNK_USER=root          
+     - SPLUNK_FORWARD_SERVER_ARG=-method clone
+   volumes_from:
+     - vforwarder
+   volumes:
+     - /var/lib/docker/containers:/host/containers:ro
+     - /var/log:/docker/log:ro 
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+   ports:
+     - 127.0.0.1:514:1514/udp
+     - 8088:8088
+     - 1514:1514
+   restart: always
+networks:
+  nett: {}

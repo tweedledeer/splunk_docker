@@ -1,0 +1,21 @@
+version: '2'
+services:
+  vsplunk:
+    image: busybox
+    volumes:
+      - /opt/splunk/etc
+      - /opt/splunk/var
+
+  splunk:
+    hostname: splunk
+    image: mava/splunk:6.4.1
+    environment:
+      SPLUNK_START_ARGS: --accept-license --answer-yes
+    volumes_from:
+      - vsplunk
+    ports:
+      - 8000:8000
+      - 9997:9997
+    expose:
+      - 8000
+    restart: always

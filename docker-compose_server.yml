@@ -1,0 +1,36 @@
+version: "3"
+services:
+  kserver:
+    # replace username/repo:tag with your name and image details
+    networks: 
+      - nett
+    image: gkarabut/mydocker:1ubuntu_zk_kafka_running_topic
+    ports:
+      - "9092:9092"
+      - "2182:2181"
+      - 80:80
+      - 443:443
+    environment:
+      SPLUNK_START_ARGS: --accept-license --answer-yes  
+    logging:
+      driver: syslog
+      options:         
+        syslog-address: udp://172.21.0.3  # from docker network inspect nett
+  kproducer:
+    networks:
+      - nett
+    image: kproducer_11dec
+    links:
+     - kserver
+    # ports:
+    #  - "8081:8080"
+  kconsumer:
+    networks:
+      - nett
+    image: kconsumer_11dec
+    links:
+     - kserver
+    # ports:
+    #  - "8082:8080"
+networks:
+  nett: {}
